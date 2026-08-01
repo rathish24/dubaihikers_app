@@ -85,6 +85,8 @@ class EventsScreen extends ConsumerWidget {
     final descriptionController =
         TextEditingController(text: event.description ?? '');
 
+    DateTime? selectedStartsAt = event.startsAt;
+
     String selectedDifficulty =
         (event.difficulty != null && event.difficulty!.isNotEmpty)
             ? event.difficulty!.toLowerCase()
@@ -99,6 +101,36 @@ class EventsScreen extends ConsumerWidget {
       builder: (sheetContext) {
         return StatefulBuilder(
           builder: (context, setStateModal) {
+            Future<void> pickDateTime() async {
+              final initialDate = selectedStartsAt ?? DateTime.now();
+              final pickedDate = await showDatePicker(
+                context: context,
+                initialDate: initialDate,
+                firstDate: DateTime(2024),
+                lastDate: DateTime(2030),
+              );
+
+              if (pickedDate != null) {
+                final initialTime = TimeOfDay.fromDateTime(initialDate);
+                final pickedTime = await showTimePicker(
+                  context: context,
+                  initialTime: initialTime,
+                );
+
+                final finalDateTime = DateTime(
+                  pickedDate.year,
+                  pickedDate.month,
+                  pickedDate.day,
+                  pickedTime?.hour ?? initialTime.hour,
+                  pickedTime?.minute ?? initialTime.minute,
+                );
+
+                setStateModal(() {
+                  selectedStartsAt = finalDateTime;
+                });
+              }
+            }
+
             return Padding(
               padding: EdgeInsets.only(
                 left: 20,
@@ -141,6 +173,34 @@ class EventsScreen extends ConsumerWidget {
                       decoration: const InputDecoration(
                         labelText: 'Location Name',
                         border: OutlineInputBorder(),
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    // Calendar Date & Time Selector
+                    InkWell(
+                      onTap: pickDateTime,
+                      borderRadius: BorderRadius.circular(4),
+                      child: InputDecorator(
+                        decoration: const InputDecoration(
+                          labelText: 'Event Date & Time (Calendar)',
+                          border: OutlineInputBorder(),
+                          suffixIcon: Icon(Icons.calendar_today,
+                              color: Colors.teal),
+                        ),
+                        child: Text(
+                          selectedStartsAt != null
+                              ? DateFormat('EEE, MMM dd, yyyy • hh:mm a')
+                                  .format(selectedStartsAt!.toLocal())
+                              : 'Tap to select event date & time',
+                          style: TextStyle(
+                            color: selectedStartsAt != null
+                                ? Colors.black87
+                                : Colors.grey,
+                            fontWeight: selectedStartsAt != null
+                                ? FontWeight.w600
+                                : FontWeight.normal,
+                          ),
+                        ),
                       ),
                     ),
                     const SizedBox(height: 12),
@@ -224,7 +284,7 @@ class EventsScreen extends ConsumerWidget {
                             distanceKm: double.tryParse(distanceController.text),
                             difficulty: selectedDifficulty,
                             description: descriptionController.text.trim(),
-                            startsAt: event.startsAt,
+                            startsAt: selectedStartsAt,
                             currency: event.currency,
                             imageUrl: event.imageUrl,
                             availableSlots: event.availableSlots,
