@@ -4,16 +4,23 @@ import 'package:mocktail/mocktail.dart';
 import 'package:dubaihikers_app/main.dart';
 import 'package:dubaihikers_app/features/leads/domain/repositories/leads_repository.dart';
 import 'package:dubaihikers_app/features/leads/presentation/providers/leads_provider.dart';
+import 'package:dubaihikers_app/features/events/domain/repositories/events_repository.dart';
+import 'package:dubaihikers_app/features/events/presentation/providers/events_provider.dart';
 
 class MockLeadsRepository extends Mock implements LeadsRepository {}
+class MockEventsRepository extends Mock implements EventsRepository {}
 
 void main() {
-  late MockLeadsRepository mockRepository;
+  late MockLeadsRepository mockLeadsRepository;
+  late MockEventsRepository mockEventsRepository;
 
   setUp(() {
-    mockRepository = MockLeadsRepository();
-    when(() => mockRepository.getLeads()).thenAnswer((_) async => []);
-    when(() => mockRepository.getEvents()).thenAnswer((_) async => []);
+    mockLeadsRepository = MockLeadsRepository();
+    mockEventsRepository = MockEventsRepository();
+
+    when(() => mockLeadsRepository.getLeads()).thenAnswer((_) async => []);
+    when(() => mockLeadsRepository.getEvents()).thenAnswer((_) async => []);
+    when(() => mockEventsRepository.getEvents()).thenAnswer((_) async => []);
   });
 
   testWidgets('DubaiHikersApp initializes and renders MainNavigationScreen',
@@ -21,7 +28,8 @@ void main() {
     await tester.pumpWidget(
       ProviderScope(
         overrides: [
-          leadsRepositoryProvider.overrideWithValue(mockRepository),
+          leadsRepositoryProvider.overrideWithValue(mockLeadsRepository),
+          eventsRepositoryProvider.overrideWithValue(mockEventsRepository),
         ],
         child: const DubaiHikersApp(),
       ),
