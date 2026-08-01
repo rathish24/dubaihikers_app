@@ -10,15 +10,18 @@ class EventsScreen extends ConsumerWidget {
 
   Color _getDifficultyColor(String? difficulty) {
     switch (difficulty?.toLowerCase()) {
+      case 'beginner':
       case 'easy':
         return Colors.green.shade600;
       case 'moderate':
         return Colors.orange.shade700;
       case 'advanced':
+        return Colors.blue.shade700;
+      case 'expert':
       case 'hard':
         return Colors.red.shade700;
       default:
-        return Colors.blue.shade700;
+        return Colors.teal.shade700;
     }
   }
 
@@ -231,20 +234,25 @@ class EventsScreen extends ConsumerWidget {
                     ),
                     const SizedBox(height: 12),
                     DropdownButtonFormField<String>(
-                      value: ['easy', 'moderate', 'advanced']
+                      value: ['beginner', 'easy', 'moderate', 'advanced', 'expert']
                               .contains(selectedDifficulty)
-                          ? selectedDifficulty
+                          ? (selectedDifficulty == 'easy'
+                              ? 'beginner'
+                              : selectedDifficulty)
                           : 'moderate',
                       decoration: const InputDecoration(
                         labelText: 'Difficulty Level',
                         border: OutlineInputBorder(),
                       ),
                       items: const [
-                        DropdownMenuItem(value: 'easy', child: Text('Easy')),
+                        DropdownMenuItem(
+                            value: 'beginner', child: Text('Beginner')),
                         DropdownMenuItem(
                             value: 'moderate', child: Text('Moderate')),
                         DropdownMenuItem(
                             value: 'advanced', child: Text('Advanced')),
+                        DropdownMenuItem(
+                            value: 'expert', child: Text('Expert')),
                       ],
                       onChanged: (val) {
                         if (val != null) {
@@ -388,10 +396,11 @@ class EventsScreen extends ConsumerWidget {
                       Padding(
                         padding: const EdgeInsets.only(right: 8.0),
                         child: FilterChip(
-                          label: const Text('Easy'),
-                          selected: state.selectedDifficulty == 'easy',
+                          label: const Text('Beginner'),
+                          selected: state.selectedDifficulty == 'beginner' ||
+                              state.selectedDifficulty == 'easy',
                           onSelected: (_) =>
-                              notifier.setSelectedDifficulty('easy'),
+                              notifier.setSelectedDifficulty('beginner'),
                         ),
                       ),
                       Padding(
@@ -410,6 +419,16 @@ class EventsScreen extends ConsumerWidget {
                           selected: state.selectedDifficulty == 'advanced',
                           onSelected: (_) =>
                               notifier.setSelectedDifficulty('advanced'),
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(right: 8.0),
+                        child: FilterChip(
+                          label: const Text('Expert'),
+                          selected: state.selectedDifficulty == 'expert' ||
+                              state.selectedDifficulty == 'hard',
+                          onSelected: (_) =>
+                              notifier.setSelectedDifficulty('expert'),
                         ),
                       ),
                     ],

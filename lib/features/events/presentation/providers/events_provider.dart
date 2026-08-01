@@ -48,10 +48,19 @@ class EventsState {
   /// Returns events filtered by search query and difficulty.
   List<EventModel> get filteredEvents {
     return events.where((event) {
-      final matchesDifficulty = selectedDifficulty == null ||
-          selectedDifficulty == 'all' ||
-          (event.difficulty?.toLowerCase() ==
-              selectedDifficulty?.toLowerCase());
+      final diff = event.difficulty?.toLowerCase() ?? '';
+      final sel = selectedDifficulty?.toLowerCase();
+
+      final bool matchesDifficulty;
+      if (sel == null || sel == 'all') {
+        matchesDifficulty = true;
+      } else if (sel == 'beginner') {
+        matchesDifficulty = diff == 'beginner' || diff == 'easy';
+      } else if (sel == 'expert') {
+        matchesDifficulty = diff == 'expert' || diff == 'hard';
+      } else {
+        matchesDifficulty = diff == sel;
+      }
 
       final query = searchQuery.trim().toLowerCase();
       final matchesSearch = query.isEmpty ||
