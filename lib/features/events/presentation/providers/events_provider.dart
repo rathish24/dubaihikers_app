@@ -88,6 +88,38 @@ class EventsNotifier extends StateNotifier<EventsState> {
     }
   }
 
+  Future<bool> updateEvent(EventModel updatedEvent) async {
+    try {
+      await repository.updateEvent(updatedEvent);
+      state = state.copyWith(
+        events: state.events
+            .map((e) => e.id == updatedEvent.id ? updatedEvent : e)
+            .toList(),
+      );
+      return true;
+    } catch (e) {
+      state = state.copyWith(
+        errorMessage: 'Failed to update event: ${e.toString()}',
+      );
+      return false;
+    }
+  }
+
+  Future<bool> deleteEvent(String eventId) async {
+    try {
+      await repository.deleteEvent(eventId);
+      state = state.copyWith(
+        events: state.events.where((e) => e.id != eventId).toList(),
+      );
+      return true;
+    } catch (e) {
+      state = state.copyWith(
+        errorMessage: 'Failed to delete event: ${e.toString()}',
+      );
+      return false;
+    }
+  }
+
   void setSearchQuery(String query) {
     state = state.copyWith(searchQuery: query);
   }

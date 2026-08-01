@@ -4,6 +4,8 @@ import '../../../leads/data/models/event_model.dart';
 
 abstract class EventsRemoteDataSource {
   Future<List<EventModel>> fetchEvents();
+  Future<void> updateEvent(EventModel event);
+  Future<void> deleteEvent(String eventId);
 }
 
 class EventsRemoteDataSourceImpl implements EventsRemoteDataSource {
@@ -22,5 +24,24 @@ class EventsRemoteDataSourceImpl implements EventsRemoteDataSource {
     return dataList
         .map((json) => EventModel.fromJson(json as Map<String, dynamic>))
         .toList();
+  }
+
+  @override
+  Future<void> updateEvent(EventModel event) async {
+    final payload = event.toJson();
+    payload.removeWhere((key, value) => value == null);
+
+    await supabaseClient
+        .from(SupabaseConstants.eventsTable)
+        .update(payload)
+        .eq('id', event.id);
+  }
+
+  @override
+  Future<void> deleteEvent(String eventId) async {
+    await supabaseClient
+        .from(SupabaseConstants.eventsTable)
+        .delete()
+        .eq('id', eventId);
   }
 }

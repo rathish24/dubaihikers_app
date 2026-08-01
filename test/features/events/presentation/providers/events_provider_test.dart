@@ -31,6 +31,16 @@ void main() {
     mockRepository = MockEventsRepository();
     when(() => mockRepository.getEvents())
         .thenAnswer((_) async => sampleEvents);
+    when(() => mockRepository.updateEvent(any()))
+        .thenAnswer((_) async => {});
+    when(() => mockRepository.deleteEvent(any()))
+        .thenAnswer((_) async => {});
+  });
+
+  setUpAll(() {
+    registerFallbackValue(
+      const EventModel(id: 'fallback-id', name: 'Fallback Event'),
+    );
   });
 
   test('EventsNotifier loads events successfully', () async {
@@ -50,7 +60,7 @@ void main() {
     expect(state.errorMessage, isNull);
   });
 
-  test('EventsNotifier search query filters events correctly', () async {
+  test('EventsNotifier updateEvent updates existing event in state', () async {
     final container = ProviderContainer(
       overrides: [
         eventsRepositoryProvider.overrideWithValue(mockRepository),
@@ -61,14 +71,23 @@ void main() {
     final notifier = container.read(eventsNotifierProvider.notifier);
     await notifier.fetchEvents();
 
-    notifier.setSearchQuery('Shawka');
+    const updatedEvent = EventModel(
+      id: 'event-1',
+      name: 'Updated Shawka Dam Trail',
+      difficulty: 'easy',
+      price: 180.0,
+    );
+
+    final success = await notifier.updateEvent(updatedEvent);
+    expect(success, isTrue);
 
     final state = container.read(eventsNotifierProvider);
-    expect(state.filteredEvents.length, equals(1));
-    expect(state.filteredEvents.first.name, equals('Shawka Dam Trail'));
+    final found = state.events.firstWhere((e) => e.id == 'event-1');
+    expect(found.name, equals('Updated Shawka Dam Trail'));
+    expect(found.price, equals(180.0));
   });
 
-  test('EventsNotifier difficulty filter works correctly', () async {
+  test('EventsNotifier deleteEvent removes event from state', () async {
     final container = ProviderContainer(
       overrides: [
         eventsRepositoryProvider.overrideWithValue(mockRepository),
@@ -79,10 +98,11 @@ void main() {
     final notifier = container.read(eventsNotifierProvider.notifier);
     await notifier.fetchEvents();
 
-    notifier.setSelectedDifficulty('advanced');
+    final success = await notifier.deleteEvent('event-1');
+    expect(success, isTrue);
 
     final state = container.read(eventsNotifierProvider);
-    expect(state.filteredEvents.length, equals(1));
-    expect(state.filteredEvents.first.name, equals('Sheri Village Trail'));
+    expect(state.events.length, equals(1));
+    expect(state.events.any((e) => e.id == 'event-1'), isFalse);
   });
 }

@@ -22,6 +22,249 @@ class EventsScreen extends ConsumerWidget {
     }
   }
 
+  void _showDeleteConfirmation(
+      BuildContext context, WidgetRef ref, EventModel event) {
+    showDialog(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Row(
+          children: [
+            Icon(Icons.warning_amber_rounded, color: Colors.redAccent),
+            SizedBox(width: 8),
+            Text('Delete Event'),
+          ],
+        ),
+        content: Text(
+          'Are you sure you want to delete "${event.name}"? This action cannot be undone.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.redAccent,
+              foregroundColor: Colors.white,
+            ),
+            onPressed: () async {
+              Navigator.of(dialogContext).pop();
+              final success = await ref
+                  .read(eventsNotifierProvider.notifier)
+                  .deleteEvent(event.id);
+              if (context.mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(
+                      success
+                          ? 'Event "${event.name}" deleted successfully.'
+                          : 'Failed to delete event.',
+                    ),
+                    backgroundColor:
+                        success ? Colors.green.shade700 : Colors.redAccent,
+                  ),
+                );
+              }
+            },
+            child: const Text('Delete'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showEditEventModal(
+      BuildContext context, WidgetRef ref, EventModel event) {
+    final nameController = TextEditingController(text: event.name);
+    final locationController =
+        TextEditingController(text: event.locationName ?? '');
+    final priceController =
+        TextEditingController(text: event.price?.toString() ?? '');
+    final distanceController =
+        TextEditingController(text: event.distanceKm?.toString() ?? '');
+    final descriptionController =
+        TextEditingController(text: event.description ?? '');
+
+    String selectedDifficulty =
+        (event.difficulty != null && event.difficulty!.isNotEmpty)
+            ? event.difficulty!.toLowerCase()
+            : 'moderate';
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (sheetContext) {
+        return StatefulBuilder(
+          builder: (context, setStateModal) {
+            return Padding(
+              padding: EdgeInsets.only(
+                left: 20,
+                right: 20,
+                top: 20,
+                bottom: MediaQuery.of(sheetContext).viewInsets.bottom + 20,
+              ),
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'Edit Event',
+                          style: Theme.of(context)
+                              .textTheme
+                              .titleLarge
+                              ?.copyWith(fontWeight: FontWeight.bold),
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.close),
+                          onPressed: () => Navigator.of(sheetContext).pop(),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+                    TextField(
+                      controller: nameController,
+                      decoration: const InputDecoration(
+                        labelText: 'Event Name',
+                        border: OutlineInputBorder(),
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    TextField(
+                      controller: locationController,
+                      decoration: const InputDecoration(
+                        labelText: 'Location Name',
+                        border: OutlineInputBorder(),
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: TextField(
+                            controller: priceController,
+                            keyboardType: TextInputType.number,
+                            decoration: const InputDecoration(
+                              labelText: 'Price (AED)',
+                              border: OutlineInputBorder(),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: TextField(
+                            controller: distanceController,
+                            keyboardType: TextInputType.number,
+                            decoration: const InputDecoration(
+                              labelText: 'Distance (km)',
+                              border: OutlineInputBorder(),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 12),
+                    DropdownButtonFormField<String>(
+                      value: ['easy', 'moderate', 'advanced']
+                              .contains(selectedDifficulty)
+                          ? selectedDifficulty
+                          : 'moderate',
+                      decoration: const InputDecoration(
+                        labelText: 'Difficulty Level',
+                        border: OutlineInputBorder(),
+                      ),
+                      items: const [
+                        DropdownMenuItem(value: 'easy', child: Text('Easy')),
+                        DropdownMenuItem(
+                            value: 'moderate', child: Text('Moderate')),
+                        DropdownMenuItem(
+                            value: 'advanced', child: Text('Advanced')),
+                      ],
+                      onChanged: (val) {
+                        if (val != null) {
+                          setStateModal(() {
+                            selectedDifficulty = val;
+                          });
+                        }
+                      },
+                    ),
+                    const SizedBox(height: 12),
+                    TextField(
+                      controller: descriptionController,
+                      maxLines: 3,
+                      decoration: const InputDecoration(
+                        labelText: 'Description',
+                        border: OutlineInputBorder(),
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 14),
+                          backgroundColor: Theme.of(context).primaryColor,
+                          foregroundColor: Colors.white,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        onPressed: () async {
+                          final updated = EventModel(
+                            id: event.id,
+                            name: nameController.text.trim(),
+                            locationName: locationController.text.trim(),
+                            price: double.tryParse(priceController.text),
+                            distanceKm: double.tryParse(distanceController.text),
+                            difficulty: selectedDifficulty,
+                            description: descriptionController.text.trim(),
+                            startsAt: event.startsAt,
+                            currency: event.currency,
+                            imageUrl: event.imageUrl,
+                            availableSlots: event.availableSlots,
+                            availability: event.availability,
+                            status: event.status,
+                          );
+
+                          Navigator.of(sheetContext).pop();
+                          final success = await ref
+                              .read(eventsNotifierProvider.notifier)
+                              .updateEvent(updated);
+
+                          if (context.mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(
+                                  success
+                                      ? 'Event "${updated.name}" updated successfully.'
+                                      : 'Failed to update event.',
+                                ),
+                                backgroundColor: success
+                                    ? Colors.green.shade700
+                                    : Colors.redAccent,
+                              ),
+                            );
+                          }
+                        },
+                        child: const Text('Save Changes'),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(eventsNotifierProvider);
@@ -217,6 +460,8 @@ class EventsScreen extends ConsumerWidget {
           return _EventCard(
             event: event,
             getDifficultyColor: _getDifficultyColor,
+            onEdit: () => _showEditEventModal(context, ref, event),
+            onDelete: () => _showDeleteConfirmation(context, ref, event),
           );
         },
       ),
@@ -227,10 +472,14 @@ class EventsScreen extends ConsumerWidget {
 class _EventCard extends StatelessWidget {
   final EventModel event;
   final Color Function(String?) getDifficultyColor;
+  final VoidCallback onEdit;
+  final VoidCallback onDelete;
 
   const _EventCard({
     required this.event,
     required this.getDifficultyColor,
+    required this.onEdit,
+    required this.onDelete,
   });
 
   @override
@@ -317,30 +566,57 @@ class _EventCard extends StatelessWidget {
                     ),
                   ),
 
-                // Availability Badge
-                if (event.availability != null)
-                  Positioned(
-                    top: 12,
-                    right: 12,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 10, vertical: 4),
-                      decoration: BoxDecoration(
-                        color: event.availability == 'open'
-                            ? Colors.green.shade700
-                            : Colors.orange.shade800,
+                // Vertical Dotted Menu (PopupMenuButton)
+                Positioned(
+                  top: 8,
+                  right: 8,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.black.withOpacity(0.65),
+                      shape: BoxShape.circle,
+                    ),
+                    child: PopupMenuButton<String>(
+                      icon: const Icon(Icons.more_vert, color: Colors.white),
+                      shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
-                      child: Text(
-                        event.availability!.toUpperCase(),
-                        style: const TextStyle(
-                          fontSize: 11,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
+                      onSelected: (value) {
+                        if (value == 'edit') {
+                          onEdit();
+                        } else if (value == 'delete') {
+                          onDelete();
+                        }
+                      },
+                      itemBuilder: (BuildContext context) => [
+                        const PopupMenuItem<String>(
+                          value: 'edit',
+                          child: Row(
+                            children: [
+                              Icon(Icons.edit_outlined,
+                                  size: 20, color: Colors.blue),
+                              SizedBox(width: 10),
+                              Text('Edit Event'),
+                            ],
+                          ),
                         ),
-                      ),
+                        const PopupMenuItem<String>(
+                          value: 'delete',
+                          child: Row(
+                            children: [
+                              Icon(Icons.delete_outline,
+                                  size: 20, color: Colors.redAccent),
+                              SizedBox(width: 10),
+                              Text(
+                                'Delete Event',
+                                style: TextStyle(color: Colors.redAccent),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
                     ),
                   ),
+                ),
               ],
             ),
 
@@ -400,7 +676,7 @@ class _EventCard extends StatelessWidget {
                   ),
                   const Divider(height: 24),
 
-                  // Bottom Info Row (Distance, Slots, Price)
+                  // Bottom Info Row (Distance, Price)
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
