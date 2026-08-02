@@ -1,263 +1,255 @@
 ---
 name: flutter-setup-declarative-routing
-description: Configure `MaterialApp.router` using `go_router` with a decoupled `AppNavigator` abstraction layer for type-safe navigation, deep linking, push notification payload routing, and seamless unit testing.
+description: Configure `MaterialApp.router` using a package like `go_router` for advanced URL-based navigation. Use when developing web applications or mobile apps that require specific deep linking and browser history support.
 metadata:
-  model: models/gemini-3.6-flash
-  last_modified: Wed, 22 Jul 2026 23:55:00 GMT
+  model: models/gemini-3.1-pro-preview
+  last_modified: Tue, 21 Apr 2026 21:08:03 GMT
 ---
-# Declarative Routing, Deep Linking, & AppNavigator Abstraction
+# Implementing Routing and Deep Linking
 
 ## Contents
-- [Core Architecture & Concepts](#core-architecture--concepts)
-- [Workflow: Initializing Router & AppNavigator Abstraction](#workflow-initializing-router--appnavigator-abstraction)
-- [Workflow: Deep Links & Push Notification Payload Handling](#workflow-deep-links--push-notification-payload-handling)
+- [Core Concepts](#core-concepts)
+- [Workflow: Initializing the Application and Router](#workflow-initializing-the-application-and-router)
 - [Workflow: Configuring Platform Deep Linking](#workflow-configuring-platform-deep-linking)
-- [Workflow: Implementing Stateful Shell & Nested Navigation](#workflow-implementing-stateful-shell--nested-navigation)
-- [Workflow: Unit Testing Navigation](#workflow-unit-testing-navigation)
+- [Workflow: Implementing Nested Navigation](#workflow-implementing-nested-navigation)
+- [Examples](#examples)
 
----
+## Core Concepts
 
-## Core Architecture & Concepts
+Use the `go_router` package for declarative routing in Flutter. It provides a robust API for complex routing scenarios, deep linking, and nested navigation. 
 
-Use `go_router` as the routing engine, wrapped inside a decoupled `AppNavigator` interface layer (Facade/Navigation Gateway pattern).
+- **GoRouter**: The central configuration object defining the application's route tree.
+- **GoRoute**: A standard route mapping a URL path to a Flutter screen.
+- **ShellRoute / StatefulShellRoute**: Wraps child routes in a persistent UI shell (e.g., a `BottomNavigationBar`). `StatefulShellRoute` maintains the state of parallel navigation branches.
+- **Path URL Strategy**: Removes the default `#` fragment from web URLs, essential for clean deep linking across platforms.
 
-- **AppRouter**: Holds the central `GoRouter` instance, route tree constants, `onException` fallback redirects, and branch definitions.
-- **AppNavigator Interface**: Abstract facade used by UI widgets and BLoCs/Controllers instead of invoking `context.go()` string paths directly.
-- **StatefulShellRoute**: Maintains persistent navigation state across parallel bottom navigation branches.
-- **Path URL Strategy**: Calls `usePathUrlStrategy()` at app startup (`main.dart`) to remove `#` fragments from Web URLs.
-- **Payload & Link Resolvers**: Handles incoming platform deep link `Uri` objects and FCM/APNs push notification JSON payloads.
+## Workflow: Initializing the Application and Router
 
----
+Follow this workflow to bootstrap a new Flutter application with `go_router` and configure the root routing mechanism.
 
-## Workflow: Initializing Router & AppNavigator Abstraction
+### Task Progress
+- [ ] Create the Flutter application.
+- [ ] Add the `go_router` dependency.
+- [ ] Configure the URL strategy for web/deep linking.
+- [ ] Implement the `GoRouter` configuration.
+- [ ] Bind the router to `MaterialApp.router`.
 
-### 1. Define AppRouter with Named & Parameterized Routes
+### 1. Scaffold the Application
+Run the following commands to create the app and add the required routing package:
+```bash
+flutter create <app-name>
+cd <app-name>
+flutter pub add go_router
+```
+
+### 2. Configure the Router
+Define a top-level `GoRouter` instance. Handle authentication or state-based routing using the `redirect` parameter.
+
 ```dart
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-
-class AppRouter {
-  static const String home = '/home';
-  static const String teacher = '/teacher';
-  static const String teacherDetail = '/teacher/:id';
-  static const String addTeacher = '/add-teacher';
-
-  static const String homeName = 'home';
-  static const String teacherName = 'teacher';
-  static const String teacherDetailName = 'teacherDetail';
-  static const String addTeacherName = 'addTeacher';
-
-  final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
-
-  late final GoRouter router = GoRouter(
-    navigatorKey: navigatorKey,
-    initialLocation: home,
-    routes: [
-      StatefulShellRoute.indexedStack(
-        builder: (context, state, navigationShell) {
-          return HomeScreen(navigationShell: navigationShell);
-        },
-        branches: [
-          StatefulShellBranch(
-            routes: [
-              GoRoute(
-                path: home,
-                name: homeName,
-                builder: (context, state) => const HomeTab(),
-              ),
-            ],
-          ),
-          StatefulShellBranch(
-            routes: [
-              GoRoute(
-                path: teacher,
-                name: teacherName,
-                builder: (context, state) => const TeachersTab(),
-                routes: [
-                  GoRoute(
-                    path: ':id',
-                    name: teacherDetailName,
-                    builder: (context, state) {
-                      final id = state.pathParameters['id'] ?? '';
-                      return TeacherDetailPage(id: id);
-                    },
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ],
-      ),
-      GoRoute(
-        parentNavigatorKey: navigatorKey,
-        path: addTeacher,
-        name: addTeacherName,
-        builder: (context, state) => const AddTeacherPage(),
-      ),
-    ],
-    onException: (context, state, router) {
-      router.go(home);
-    },
-  );
-}
-```
-
-### 2. Define AppNavigator Interface & Implementation
-```dart
-abstract class AppNavigator {
-  void goToHome();
-  void goToTeacher();
-  void goToTeacherDetail(String id);
-  void goToAddTeacher();
-  void handleDeepLink(Uri uri);
-  void handleNotificationPayload(Map<String, dynamic> payload);
-  void goBack();
-}
-
-class AppNavigatorImpl implements AppNavigator {
-  final AppRouter appRouter;
-
-  AppNavigatorImpl(this.appRouter);
-
-  @override
-  void goToHome() => appRouter.router.go(AppRouter.home);
-
-  @override
-  void goToTeacher() => appRouter.router.go(AppRouter.teacher);
-
-  @override
-  void goToTeacherDetail(String id) {
-    appRouter.router.goNamed(
-      AppRouter.teacherDetailName,
-      pathParameters: {'id': id},
-    );
-  }
-
-  @override
-  void goToAddTeacher() => appRouter.router.go(AppRouter.addTeacher);
-
-  @override
-  void handleDeepLink(Uri uri) {
-    String path;
-    if (uri.scheme == 'http' || uri.scheme == 'https') {
-      path = uri.path;
-    } else {
-      final hostStr = uri.host.isNotEmpty ? '/${uri.host}' : '';
-      path = '$hostStr${uri.path}';
-    }
-    if (path.isEmpty) path = AppRouter.home;
-    final fullPath = uri.hasQuery ? '$path?${uri.query}' : path;
-    final formattedPath = fullPath.startsWith('/') ? fullPath : '/$fullPath';
-    appRouter.router.go(formattedPath);
-  }
-
-  @override
-  void handleNotificationPayload(Map<String, dynamic> payload) {
-    if (payload.containsKey('uri') && payload['uri'] != null) {
-      handleDeepLink(Uri.parse(payload['uri'].toString()));
-    } else if (payload.containsKey('route') && payload['route'] != null) {
-      final route = payload['route'].toString();
-      final formattedRoute = route.startsWith('/') ? route : '/$route';
-      appRouter.router.go(formattedRoute);
-    } else if (payload.containsKey('target') && payload['target'] != null) {
-      final target = payload['target'].toString();
-      final id = payload['id']?.toString();
-      switch (target) {
-        case 'teacher':
-          if (id != null && id.isNotEmpty) {
-            goToTeacherDetail(id);
-          } else {
-            goToTeacher();
-          }
-          break;
-        case 'addTeacher':
-          goToAddTeacher();
-          break;
-        default:
-          goToHome();
-      }
-    }
-  }
-
-  @override
-  void goBack() => appRouter.router.pop();
-}
-```
-
-### 3. Initialize in main.dart & DI
-```dart
-import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_web_plugins/url_strategy.dart';
 
-Future<void> main() async {
+void main() {
+  // Use path URL strategy to remove the '#' from web URLs
   usePathUrlStrategy();
-  WidgetsFlutterBinding.ensureInitialized();
-  await setupLocator();
   runApp(const MyApp());
 }
+
+final GoRouter _router = GoRouter(
+  initialLocation: '/',
+  routes: [
+    GoRoute(
+      path: '/',
+      builder: (context, state) => const HomeScreen(),
+      routes: [
+        GoRoute(
+          path: 'details/:id',
+          builder: (context, state) => DetailsScreen(id: state.pathParameters['id']!),
+        ),
+      ],
+    ),
+  ],
+  errorBuilder: (context, state) => ErrorScreen(error: state.error),
+);
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return RepositoryProvider<AppNavigator>.value(
-      value: sl<AppNavigator>(),
-      child: MaterialApp.router(
-        routerConfig: sl<AppRouter>().router,
+    return MaterialApp.router(
+      routerConfig: _router,
+      title: 'Routing App',
+    );
+  }
+}
+```
+
+## Workflow: Configuring Platform Deep Linking
+
+Configure the native platforms to intercept specific URLs and route them into the Flutter application.
+
+### Task Progress
+- [ ] Determine target platforms (iOS, Android, or both).
+- [ ] Apply conditional configuration for Android (Manifest + Asset Links).
+- [ ] Apply conditional configuration for iOS (Plist + Entitlements + AASA).
+- [ ] Run validator -> review errors -> fix.
+
+### If configuring for Android:
+1. **Modify `AndroidManifest.xml`**: Add the intent filter inside the `<activity>` tag for `.MainActivity`.
+```xml
+<intent-filter android:autoVerify="true">
+    <action android:name="android.intent.action.VIEW" />
+    <category android:name="android.intent.category.DEFAULT" />
+    <category android:name="android.intent.category.BROWSABLE" />
+    <data android:scheme="http" android:host="yourdomain.com" />
+    <data android:scheme="https" />
+</intent-filter>
+```
+2. **Host `assetlinks.json`**: Serve the following JSON at `https://yourdomain.com/.well-known/assetlinks.json`.
+```json
+[{
+  "relation": ["delegate_permission/common.handle_all_urls"],
+  "target": {
+    "namespace": "android_app",
+    "package_name": "com.yourcompany.yourapp",
+    "sha256_cert_fingerprints": ["YOUR_SHA256_FINGERPRINT"]
+  }
+}]
+```
+
+### If configuring for iOS:
+1. **Modify `Info.plist`**: Opt-in to Flutter's default deep link handler. 
+*Note: If using a third-party deep linking plugin (e.g., `app_links`), set this to `NO` to prevent conflicts.*
+```xml
+<key>FlutterDeepLinkingEnabled</key>
+<true/>
+```
+2. **Modify `Runner.entitlements`**: Add the associated domain.
+```xml
+<key>com.apple.developer.associated-domains</key>
+<array>
+  <string>applinks:yourdomain.com</string>
+</array>
+```
+3. **Host `apple-app-site-association`**: Serve the following JSON (without a `.json` extension) at `https://yourdomain.com/.well-known/apple-app-site-association`.
+```json
+{
+  "applinks": {
+    "apps": [],
+    "details": [{
+      "appIDs": ["TEAM_ID.com.yourcompany.yourapp"],
+      "paths": ["*"],
+      "components": [{"/": "/*"}]
+    }]
+  }
+}
+```
+
+### Validation Loop
+Run validator -> review errors -> fix.
+- **Android**: Test using ADB.
+  ```bash
+  adb shell 'am start -a android.intent.action.VIEW -c android.intent.category.BROWSABLE -d "https://yourdomain.com/details/123"' com.yourcompany.yourapp
+  ```
+- **iOS**: Test using `xcrun` on a booted simulator.
+  ```bash
+  xcrun simctl openurl booted https://yourdomain.com/details/123
+  ```
+
+## Workflow: Implementing Nested Navigation
+
+Use `StatefulShellRoute` to implement persistent UI shells (like a bottom navigation bar) that maintain the state of their child routes.
+
+### Task Progress
+- [ ] Define `StatefulShellRoute.indexedStack` in the `GoRouter` configuration.
+- [ ] Create `StatefulShellBranch` instances for each navigation tab.
+- [ ] Implement the shell widget using `StatefulNavigationShell`.
+
+```dart
+final GoRouter _router = GoRouter(
+  initialLocation: '/home',
+  routes: [
+    StatefulShellRoute.indexedStack(
+      builder: (context, state, navigationShell) {
+        return ScaffoldWithNavBar(navigationShell: navigationShell);
+      },
+      branches: [
+        StatefulShellBranch(
+          routes: [
+            GoRoute(
+              path: '/home',
+              builder: (context, state) => const HomeScreen(),
+            ),
+          ],
+        ),
+        StatefulShellBranch(
+          routes: [
+            GoRoute(
+              path: '/settings',
+              builder: (context, state) => const SettingsScreen(),
+            ),
+          ],
+        ),
+      ],
+    ),
+  ],
+);
+```
+
+## Examples
+
+### High-Fidelity Shell Widget Implementation
+Implement the UI shell that consumes the `StatefulNavigationShell` to handle branch switching.
+
+```dart
+class ScaffoldWithNavBar extends StatelessWidget {
+  const ScaffoldWithNavBar({
+    required this.navigationShell,
+    super.key,
+  });
+
+  final StatefulNavigationShell navigationShell;
+
+  void _goBranch(int index) {
+    navigationShell.goBranch(
+      index,
+      // Support navigating to the initial location when tapping the active tab.
+      initialLocation: index == navigationShell.currentIndex,
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: navigationShell,
+      bottomNavigationBar: NavigationBar(
+        selectedIndex: navigationShell.currentIndex,
+        onDestinationSelected: _goBranch,
+        destinations: const [
+          NavigationDestination(icon: Icon(Icons.home), label: 'Home'),
+          NavigationDestination(icon: Icon(Icons.settings), label: 'Settings'),
+        ],
       ),
     );
   }
 }
 ```
 
----
-
-## Workflow: Configuring Platform Deep Linking
-
-### Android (`android/app/src/main/AndroidManifest.xml`)
-```xml
-<activity android:name=".MainActivity" ...>
-    <intent-filter android:autoVerify="true">
-        <action android:name="android.intent.action.VIEW" />
-        <category android:name="android.intent.category.DEFAULT" />
-        <category android:name="android.intent.category.BROWSABLE" />
-        <data android:scheme="http" android:host="yourdomain.com" />
-        <data android:scheme="https" />
-        <data android:scheme="myapp" />
-    </intent-filter>
-</activity>
-```
-
-### iOS (`ios/Runner/Info.plist`)
-```xml
-<key>FlutterDeepLinkingEnabled</key>
-<true/>
-```
-
----
-
-## Workflow: Unit Testing Navigation
-
-Using `AppNavigator` enables testing route transitions cleanly using widget tests:
+### Programmatic Navigation
+Use the `context.go()` and `context.push()` extension methods provided by `go_router`.
 
 ```dart
-testWidgets('handleNotificationPayload navigates to teacher detail', (tester) async {
-  await tester.pumpWidget(
-    RepositoryProvider<AppNavigator>.value(
-      value: navigator,
-      child: MaterialApp.router(routerConfig: appRouter.router),
-    ),
-  );
-  await tester.pump(const Duration(milliseconds: 300));
+// Replaces the current route stack with the target route (Declarative)
+context.go('/details/123');
 
-  navigator.handleNotificationPayload({'target': 'teacher', 'id': '42'});
-  await tester.pump(const Duration(milliseconds: 300));
+// Pushes the target route onto the existing stack (Imperative)
+context.push('/details/123');
 
-  expect(
-    appRouter.router.routerDelegate.currentConfiguration.uri.toString(),
-    equals('/teacher/42'),
-  );
-});
+// Navigates using a named route and path parameters
+context.goNamed('details', pathParameters: {'id': '123'});
+
+// Pops the current route
+context.pop();
 ```
