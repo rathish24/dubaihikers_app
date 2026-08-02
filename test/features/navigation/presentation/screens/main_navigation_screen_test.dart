@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:dubaihikers_app/features/navigation/presentation/screens/main_navigation_screen.dart';
+import 'package:dubaihikers_app/core/navigation/app_router.dart';
 import 'package:dubaihikers_app/features/leads/domain/repositories/leads_repository.dart';
 import 'package:dubaihikers_app/features/leads/presentation/providers/leads_provider.dart';
 import 'package:dubaihikers_app/features/events/domain/repositories/events_repository.dart';
@@ -26,14 +26,16 @@ void main() {
 
   testWidgets('MainNavigationScreen displays 3 bottom tabs (Lead, Event, Profile)',
       (WidgetTester tester) async {
+    final appRouter = AppRouter();
+
     await tester.pumpWidget(
       ProviderScope(
         overrides: [
           leadsRepositoryProvider.overrideWithValue(mockLeadsRepository),
           eventsRepositoryProvider.overrideWithValue(mockEventsRepository),
         ],
-        child: const MaterialApp(
-          home: MainNavigationScreen(),
+        child: MaterialApp.router(
+          routerConfig: appRouter.router,
         ),
       ),
     );

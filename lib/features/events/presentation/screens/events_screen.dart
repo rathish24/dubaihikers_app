@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
+import '../../../../core/navigation/app_navigator_provider.dart';
 import '../../../leads/data/models/event_model.dart';
 import '../providers/events_provider.dart';
-import 'event_detail_screen.dart';
 
 class EventsScreen extends ConsumerWidget {
   const EventsScreen({super.key});
@@ -539,7 +539,7 @@ class EventsScreen extends ConsumerWidget {
   }
 }
 
-class _EventCard extends StatelessWidget {
+class _EventCard extends ConsumerWidget {
   final EventModel event;
   final Color Function(String?) getDifficultyColor;
   final VoidCallback onEdit;
@@ -553,7 +553,7 @@ class _EventCard extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final dateFormat = DateFormat('EEE, MMM dd, yyyy • hh:mm a');
     final formattedDate = event.startsAt != null
         ? dateFormat.format(event.startsAt!.toLocal())
@@ -565,12 +565,7 @@ class _EventCard extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 16.0),
       child: InkWell(
         onTap: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (_) => EventDetailScreen(event: event),
-            ),
-          );
+          ref.read(appNavigatorProvider).goToEventDetail(event);
         },
         borderRadius: BorderRadius.circular(16),
         child: Column(

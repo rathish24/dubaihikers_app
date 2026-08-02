@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
+import '../../../../core/navigation/app_navigator_provider.dart';
 import '../providers/leads_provider.dart';
-import 'lead_detail_screen.dart';
 
 class LeadsScreen extends ConsumerWidget {
   const LeadsScreen({super.key});
@@ -197,7 +197,7 @@ class LeadsScreen extends ConsumerWidget {
   }
 }
 
-class _EventLeadGroupCard extends StatelessWidget {
+class _EventLeadGroupCard extends ConsumerWidget {
   final String eventName;
   final List<dynamic> leads;
 
@@ -207,7 +207,7 @@ class _EventLeadGroupCard extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     DateTime? eventDate;
     if (leads.isNotEmpty) {
       eventDate = leads.first.event?.startsAt;
@@ -410,12 +410,7 @@ class _EventLeadGroupCard extends StatelessWidget {
                   color: Colors.grey,
                 ),
                 onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => LeadDetailScreen(lead: lead),
-                    ),
-                  );
+                  ref.read(appNavigatorProvider).goToLeadDetail(lead);
                 },
               );
             },

@@ -1,33 +1,28 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../events/presentation/screens/events_screen.dart';
-import '../../../leads/presentation/screens/leads_screen.dart';
-import '../../../profile/presentation/screens/profile_screen.dart';
-import '../providers/navigation_provider.dart';
+import 'package:go_router/go_router.dart';
 
-class MainNavigationScreen extends ConsumerWidget {
-  const MainNavigationScreen({super.key});
+class MainNavigationScreen extends StatelessWidget {
+  final StatefulNavigationShell navigationShell;
 
-  static const List<Widget> _screens = [
-    LeadsScreen(),
-    EventsScreen(),
-    ProfileScreen(),
-  ];
+  const MainNavigationScreen({
+    super.key,
+    required this.navigationShell,
+  });
+
+  void _onTapDestination(int index) {
+    navigationShell.goBranch(
+      index,
+      initialLocation: index == navigationShell.currentIndex,
+    );
+  }
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final currentIndex = ref.watch(navigationIndexProvider);
-
+  Widget build(BuildContext context) {
     return Scaffold(
-      body: IndexedStack(
-        index: currentIndex,
-        children: _screens,
-      ),
+      body: navigationShell,
       bottomNavigationBar: NavigationBar(
-        selectedIndex: currentIndex,
-        onDestinationSelected: (index) {
-          ref.read(navigationIndexProvider.notifier).state = index;
-        },
+        selectedIndex: navigationShell.currentIndex,
+        onDestinationSelected: _onTapDestination,
         destinations: const [
           NavigationDestination(
             icon: Icon(Icons.people_alt_outlined),
