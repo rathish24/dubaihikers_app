@@ -1,8 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/network/supabase_client_provider.dart';
 import '../../data/datasources/leads_remote_datasource.dart';
-import '../../data/models/event_model.dart';
-import '../../data/models/lead_model.dart';
 import '../../data/repositories/leads_repository_impl.dart';
 import '../../domain/repositories/leads_repository.dart';
 

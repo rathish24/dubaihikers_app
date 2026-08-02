@@ -7,25 +7,21 @@ class EventDetailScreen extends StatelessWidget {
 
   const EventDetailScreen({super.key, required this.event});
 
-  Color _getDifficultyColor(String? difficulty) {
-    switch (difficulty?.toLowerCase()) {
-      case 'easy':
-        return Colors.green.shade600;
-      case 'moderate':
-        return Colors.orange.shade700;
-      case 'advanced':
-      case 'hard':
-        return Colors.red.shade700;
-      default:
-        return Colors.blue.shade700;
-    }
-  }
+  Color _getDifficultyColor(String? difficulty) =>
+      switch (difficulty?.toLowerCase()) {
+        'beginner' || 'easy' => Colors.green.shade600,
+        'moderate' => Colors.orange.shade700,
+        'advanced' => Colors.blue.shade700,
+        'expert' || 'hard' => Colors.red.shade700,
+        _ => Colors.teal.shade700,
+      };
 
   @override
   Widget build(BuildContext context) {
     final dateFormat = DateFormat('EEE, MMM dd, yyyy • hh:mm a');
-    final formattedDate =
-        event.startsAt != null ? dateFormat.format(event.startsAt!.toLocal()) : 'TBD';
+    final formattedDate = event.startsAt != null
+        ? dateFormat.format(event.startsAt!.toLocal())
+        : 'TBD';
 
     final diffColor = _getDifficultyColor(event.difficulty);
 
@@ -58,7 +54,7 @@ class EventDetailScreen extends StatelessWidget {
                     Image.network(
                       event.imageUrl!,
                       fit: BoxFit.cover,
-                      errorBuilder: (_, __, ___) => Container(
+                      errorBuilder: (context, error, stackTrace) => Container(
                         color: Theme.of(context).primaryColor,
                         child: const Icon(Icons.landscape,
                             size: 80, color: Colors.white70),
@@ -77,8 +73,8 @@ class EventDetailScreen extends StatelessWidget {
                         begin: Alignment.topCenter,
                         end: Alignment.bottomCenter,
                         colors: [
-                          Colors.black.withOpacity(0.3),
-                          Colors.black.withOpacity(0.7),
+                          Colors.black.withAlpha(76),
+                          Colors.black.withAlpha(178),
                         ],
                       ),
                     ),
@@ -103,7 +99,7 @@ class EventDetailScreen extends StatelessWidget {
                           padding: const EdgeInsets.symmetric(
                               horizontal: 12, vertical: 6),
                           decoration: BoxDecoration(
-                            color: diffColor.withOpacity(0.15),
+                            color: diffColor.withAlpha(38),
                             borderRadius: BorderRadius.circular(20),
                             border: Border.all(color: diffColor),
                           ),
@@ -280,7 +276,8 @@ class EventDetailScreen extends StatelessWidget {
                         child: Column(
                           children: event.highlights!.map((highlight) {
                             return Padding(
-                              padding: const EdgeInsets.symmetric(vertical: 4.0),
+                              padding:
+                                  const EdgeInsets.symmetric(vertical: 4.0),
                               child: Row(
                                 children: [
                                   Icon(Icons.check_circle,
@@ -320,7 +317,8 @@ class EventDetailScreen extends StatelessWidget {
                         child: Column(
                           children: event.includedItems!.map((item) {
                             return Padding(
-                              padding: const EdgeInsets.symmetric(vertical: 4.0),
+                              padding:
+                                  const EdgeInsets.symmetric(vertical: 4.0),
                               child: Row(
                                 children: [
                                   const Icon(Icons.verified,

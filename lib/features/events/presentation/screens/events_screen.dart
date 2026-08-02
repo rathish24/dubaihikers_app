@@ -8,22 +8,14 @@ import 'event_detail_screen.dart';
 class EventsScreen extends ConsumerWidget {
   const EventsScreen({super.key});
 
-  Color _getDifficultyColor(String? difficulty) {
-    switch (difficulty?.toLowerCase()) {
-      case 'beginner':
-      case 'easy':
-        return Colors.green.shade600;
-      case 'moderate':
-        return Colors.orange.shade700;
-      case 'advanced':
-        return Colors.blue.shade700;
-      case 'expert':
-      case 'hard':
-        return Colors.red.shade700;
-      default:
-        return Colors.teal.shade700;
-    }
-  }
+  Color _getDifficultyColor(String? difficulty) =>
+      switch (difficulty?.toLowerCase()) {
+        'beginner' || 'easy' => Colors.green.shade600,
+        'moderate' => Colors.orange.shade700,
+        'advanced' => Colors.blue.shade700,
+        'expert' || 'hard' => Colors.red.shade700,
+        _ => Colors.teal.shade700,
+      };
 
   void _showDeleteConfirmation(
       BuildContext context, WidgetRef ref, EventModel event) {
@@ -55,19 +47,18 @@ class EventsScreen extends ConsumerWidget {
               final success = await ref
                   .read(eventsNotifierProvider.notifier)
                   .deleteEvent(event.id);
-              if (context.mounted) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(
-                      success
-                          ? 'Event "${event.name}" deleted successfully.'
-                          : 'Failed to delete event.',
-                    ),
-                    backgroundColor:
-                        success ? Colors.green.shade700 : Colors.redAccent,
+              if (!context.mounted) return;
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(
+                    success
+                        ? 'Event "${event.name}" deleted successfully.'
+                        : 'Failed to delete event.',
                   ),
-                );
-              }
+                  backgroundColor:
+                      success ? Colors.green.shade700 : Colors.redAccent,
+                ),
+              );
             },
             child: const Text('Delete'),
           ),
@@ -114,6 +105,7 @@ class EventsScreen extends ConsumerWidget {
               );
 
               if (pickedDate != null) {
+                if (!context.mounted) return;
                 final initialTime = TimeOfDay.fromDateTime(initialDate);
                 final pickedTime = await showTimePicker(
                   context: context,
@@ -234,7 +226,7 @@ class EventsScreen extends ConsumerWidget {
                     ),
                     const SizedBox(height: 12),
                     DropdownButtonFormField<String>(
-                      value: ['beginner', 'easy', 'moderate', 'advanced', 'expert']
+                      initialValue: ['beginner', 'easy', 'moderate', 'advanced', 'expert']
                               .contains(selectedDifficulty)
                           ? (selectedDifficulty == 'easy'
                               ? 'beginner'
@@ -305,20 +297,19 @@ class EventsScreen extends ConsumerWidget {
                               .read(eventsNotifierProvider.notifier)
                               .updateEvent(updated);
 
-                          if (context.mounted) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text(
-                                  success
-                                      ? 'Event "${updated.name}" updated successfully.'
-                                      : 'Failed to update event.',
-                                ),
-                                backgroundColor: success
-                                    ? Colors.green.shade700
-                                    : Colors.redAccent,
+                          if (!context.mounted) return;
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(
+                                success
+                                    ? 'Event "${updated.name}" updated successfully.'
+                                    : 'Failed to update event.',
                               ),
-                            );
-                          }
+                              backgroundColor: success
+                                  ? Colors.green.shade700
+                                  : Colors.redAccent,
+                            ),
+                          );
                         },
                         child: const Text('Save Changes'),
                       ),
@@ -592,7 +583,7 @@ class _EventCard extends StatelessWidget {
                   height: 160,
                   width: double.infinity,
                   decoration: BoxDecoration(
-                    color: Theme.of(context).primaryColor.withOpacity(0.1),
+                    color: Theme.of(context).primaryColor.withAlpha(25),
                     borderRadius: const BorderRadius.only(
                       topLeft: Radius.circular(16),
                       topRight: Radius.circular(16),
@@ -607,7 +598,8 @@ class _EventCard extends StatelessWidget {
                           child: Image.network(
                             event.imageUrl!,
                             fit: BoxFit.cover,
-                            errorBuilder: (_, __, ___) => Container(
+                            errorBuilder: (context, error, stackTrace) =>
+                                Container(
                               color: Theme.of(context).primaryColor,
                               child: const Icon(Icons.landscape,
                                   size: 64, color: Colors.white60),
@@ -630,7 +622,7 @@ class _EventCard extends StatelessWidget {
                       padding: const EdgeInsets.symmetric(
                           horizontal: 10, vertical: 4),
                       decoration: BoxDecoration(
-                        color: Colors.black.withOpacity(0.75),
+                        color: Colors.black.withAlpha(191),
                         borderRadius: BorderRadius.circular(12),
                         border: Border.all(color: diffColor, width: 1.5),
                       ),
@@ -651,7 +643,7 @@ class _EventCard extends StatelessWidget {
                   right: 8,
                   child: Container(
                     decoration: BoxDecoration(
-                      color: Colors.black.withOpacity(0.65),
+                      color: Colors.black.withAlpha(165),
                       shape: BoxShape.circle,
                     ),
                     child: PopupMenuButton<String>(

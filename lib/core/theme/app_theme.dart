@@ -13,8 +13,7 @@ class AppTheme {
         seedColor: primaryGreen,
         primary: primaryGreen,
         secondary: accentAmber,
-        surface: Colors.white,
-        background: lightBg,
+        surface: lightBg,
         brightness: Brightness.light,
       ),
       scaffoldBackgroundColor: lightBg,
@@ -32,7 +31,7 @@ class AppTheme {
       ),
       cardTheme: CardThemeData(
         elevation: 2,
-        shadowColor: Colors.black.withOpacity(0.06),
+        shadowColor: Colors.black.withAlpha(15),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16),
         ),
@@ -46,7 +45,7 @@ class AppTheme {
       navigationBarTheme: NavigationBarThemeData(
         elevation: 8,
         backgroundColor: Colors.white,
-        indicatorColor: primaryGreen.withOpacity(0.15),
+        indicatorColor: primaryGreen.withAlpha(38),
         labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
         iconTheme: WidgetStateProperty.resolveWith((states) {
           if (states.contains(WidgetState.selected)) {

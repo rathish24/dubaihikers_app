@@ -226,7 +226,7 @@ class _EventLeadGroupCard extends StatelessWidget {
             width: double.infinity,
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             decoration: BoxDecoration(
-              color: Theme.of(context).primaryColor.withOpacity(0.08),
+              color: Theme.of(context).primaryColor.withAlpha(20),
               borderRadius: const BorderRadius.only(
                 topLeft: Radius.circular(16),
                 topRight: Radius.circular(16),
@@ -301,7 +301,7 @@ class _EventLeadGroupCard extends StatelessWidget {
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
             itemCount: leads.length,
-            separatorBuilder: (_, __) => const Divider(height: 1),
+            separatorBuilder: (context, index) => const Divider(height: 1),
             itemBuilder: (context, index) {
               final lead = leads[index];
               final hasEnquiry = lead.customerNotes != null &&
@@ -312,7 +312,7 @@ class _EventLeadGroupCard extends StatelessWidget {
                     const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
                 leading: CircleAvatar(
                   backgroundColor:
-                      Theme.of(context).primaryColor.withOpacity(0.12),
+                      Theme.of(context).primaryColor.withAlpha(30),
                   child: Text(
                     lead.contactName.isNotEmpty
                         ? lead.contactName[0].toUpperCase()

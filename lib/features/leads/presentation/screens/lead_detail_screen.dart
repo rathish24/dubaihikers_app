@@ -46,7 +46,7 @@ class LeadDetailScreen extends StatelessWidget {
                     CircleAvatar(
                       radius: 32,
                       backgroundColor:
-                          Theme.of(context).primaryColor.withOpacity(0.1),
+                          Theme.of(context).primaryColor.withAlpha(25),
                       child: Text(
                         lead.contactName.isNotEmpty
                             ? lead.contactName[0].toUpperCase()
