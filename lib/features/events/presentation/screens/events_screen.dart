@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
-import '../../../../core/navigation/app_navigator_provider.dart';
+import '../../../../routes/app_navigator_provider.dart';
 import '../../../leads/data/models/event_model.dart';
-import '../providers/events_provider.dart';
+import '../../providers/events_provider.dart';
 
 class EventsScreen extends ConsumerWidget {
   const EventsScreen({super.key});
@@ -18,7 +18,10 @@ class EventsScreen extends ConsumerWidget {
       };
 
   void _showDeleteConfirmation(
-      BuildContext context, WidgetRef ref, EventModel event) {
+    BuildContext context,
+    WidgetRef ref,
+    EventModel event,
+  ) {
     showDialog(
       context: context,
       builder: (dialogContext) => AlertDialog(
@@ -55,8 +58,9 @@ class EventsScreen extends ConsumerWidget {
                         ? 'Event "${event.name}" deleted successfully.'
                         : 'Failed to delete event.',
                   ),
-                  backgroundColor:
-                      success ? Colors.green.shade700 : Colors.redAccent,
+                  backgroundColor: success
+                      ? Colors.green.shade700
+                      : Colors.redAccent,
                 ),
               );
             },
@@ -68,23 +72,30 @@ class EventsScreen extends ConsumerWidget {
   }
 
   void _showEditEventModal(
-      BuildContext context, WidgetRef ref, EventModel event) {
+    BuildContext context,
+    WidgetRef ref,
+    EventModel event,
+  ) {
     final nameController = TextEditingController(text: event.name);
-    final locationController =
-        TextEditingController(text: event.locationName ?? '');
-    final priceController =
-        TextEditingController(text: event.price?.toString() ?? '');
-    final distanceController =
-        TextEditingController(text: event.distanceKm?.toString() ?? '');
-    final descriptionController =
-        TextEditingController(text: event.description ?? '');
+    final locationController = TextEditingController(
+      text: event.locationName ?? '',
+    );
+    final priceController = TextEditingController(
+      text: event.price?.toString() ?? '',
+    );
+    final distanceController = TextEditingController(
+      text: event.distanceKm?.toString() ?? '',
+    );
+    final descriptionController = TextEditingController(
+      text: event.description ?? '',
+    );
 
     DateTime? selectedStartsAt = event.startsAt;
 
     String selectedDifficulty =
         (event.difficulty != null && event.difficulty!.isNotEmpty)
-            ? event.difficulty!.toLowerCase()
-            : 'moderate';
+        ? event.difficulty!.toLowerCase()
+        : 'moderate';
 
     showModalBottomSheet(
       context: context,
@@ -143,9 +154,7 @@ class EventsScreen extends ConsumerWidget {
                       children: [
                         Text(
                           'Edit Event',
-                          style: Theme.of(context)
-                              .textTheme
-                              .titleLarge
+                          style: Theme.of(context).textTheme.titleLarge
                               ?.copyWith(fontWeight: FontWeight.bold),
                         ),
                         IconButton(
@@ -179,13 +188,16 @@ class EventsScreen extends ConsumerWidget {
                         decoration: const InputDecoration(
                           labelText: 'Event Date & Time (Calendar)',
                           border: OutlineInputBorder(),
-                          suffixIcon: Icon(Icons.calendar_today,
-                              color: Colors.teal),
+                          suffixIcon: Icon(
+                            Icons.calendar_today,
+                            color: Colors.teal,
+                          ),
                         ),
                         child: Text(
                           selectedStartsAt != null
-                              ? DateFormat('EEE, MMM dd, yyyy • hh:mm a')
-                                  .format(selectedStartsAt!.toLocal())
+                              ? DateFormat(
+                                  'EEE, MMM dd, yyyy • hh:mm a',
+                                ).format(selectedStartsAt!.toLocal())
                               : 'Tap to select event date & time',
                           style: TextStyle(
                             color: selectedStartsAt != null
@@ -226,11 +238,17 @@ class EventsScreen extends ConsumerWidget {
                     ),
                     const SizedBox(height: 12),
                     DropdownButtonFormField<String>(
-                      initialValue: ['beginner', 'easy', 'moderate', 'advanced', 'expert']
-                              .contains(selectedDifficulty)
+                      initialValue:
+                          [
+                            'beginner',
+                            'easy',
+                            'moderate',
+                            'advanced',
+                            'expert',
+                          ].contains(selectedDifficulty)
                           ? (selectedDifficulty == 'easy'
-                              ? 'beginner'
-                              : selectedDifficulty)
+                                ? 'beginner'
+                                : selectedDifficulty)
                           : 'moderate',
                       decoration: const InputDecoration(
                         labelText: 'Difficulty Level',
@@ -238,13 +256,21 @@ class EventsScreen extends ConsumerWidget {
                       ),
                       items: const [
                         DropdownMenuItem(
-                            value: 'beginner', child: Text('Beginner')),
+                          value: 'beginner',
+                          child: Text('Beginner'),
+                        ),
                         DropdownMenuItem(
-                            value: 'moderate', child: Text('Moderate')),
+                          value: 'moderate',
+                          child: Text('Moderate'),
+                        ),
                         DropdownMenuItem(
-                            value: 'advanced', child: Text('Advanced')),
+                          value: 'advanced',
+                          child: Text('Advanced'),
+                        ),
                         DropdownMenuItem(
-                            value: 'expert', child: Text('Expert')),
+                          value: 'expert',
+                          child: Text('Expert'),
+                        ),
                       ],
                       onChanged: (val) {
                         if (val != null) {
@@ -281,7 +307,9 @@ class EventsScreen extends ConsumerWidget {
                             name: nameController.text.trim(),
                             locationName: locationController.text.trim(),
                             price: double.tryParse(priceController.text),
-                            distanceKm: double.tryParse(distanceController.text),
+                            distanceKm: double.tryParse(
+                              distanceController.text,
+                            ),
                             difficulty: selectedDifficulty,
                             description: descriptionController.text.trim(),
                             startsAt: selectedStartsAt,
@@ -378,7 +406,8 @@ class EventsScreen extends ConsumerWidget {
                         padding: const EdgeInsets.only(right: 8.0),
                         child: FilterChip(
                           label: const Text('All Difficulties'),
-                          selected: state.selectedDifficulty == null ||
+                          selected:
+                              state.selectedDifficulty == null ||
                               state.selectedDifficulty == 'all',
                           onSelected: (_) =>
                               notifier.setSelectedDifficulty('all'),
@@ -388,7 +417,8 @@ class EventsScreen extends ConsumerWidget {
                         padding: const EdgeInsets.only(right: 8.0),
                         child: FilterChip(
                           label: const Text('Beginner'),
-                          selected: state.selectedDifficulty == 'beginner' ||
+                          selected:
+                              state.selectedDifficulty == 'beginner' ||
                               state.selectedDifficulty == 'easy',
                           onSelected: (_) =>
                               notifier.setSelectedDifficulty('beginner'),
@@ -416,7 +446,8 @@ class EventsScreen extends ConsumerWidget {
                         padding: const EdgeInsets.only(right: 8.0),
                         child: FilterChip(
                           label: const Text('Expert'),
-                          selected: state.selectedDifficulty == 'expert' ||
+                          selected:
+                              state.selectedDifficulty == 'expert' ||
                               state.selectedDifficulty == 'hard',
                           onSelected: (_) =>
                               notifier.setSelectedDifficulty('expert'),
@@ -431,9 +462,7 @@ class EventsScreen extends ConsumerWidget {
           const Divider(height: 1),
 
           // Main Body Content
-          Expanded(
-            child: _buildBody(context, ref, state, notifier),
-          ),
+          Expanded(child: _buildBody(context, ref, state, notifier)),
         ],
       ),
     );
@@ -446,9 +475,7 @@ class EventsScreen extends ConsumerWidget {
     EventsNotifier notifier,
   ) {
     if (state.isLoading) {
-      return const Center(
-        child: CircularProgressIndicator(),
-      );
+      return const Center(child: CircularProgressIndicator());
     }
 
     if (state.errorMessage != null) {
@@ -466,9 +493,9 @@ class EventsScreen extends ConsumerWidget {
               const SizedBox(height: 16),
               Text(
                 'Failed to load events',
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
+                style: Theme.of(
+                  context,
+                ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 8),
               Text(
@@ -510,8 +537,8 @@ class EventsScreen extends ConsumerWidget {
                 Text(
                   'No events found matching criteria',
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        color: Colors.grey.shade600,
-                      ),
+                    color: Colors.grey.shade600,
+                  ),
                 ),
               ],
             ),
@@ -595,16 +622,22 @@ class _EventCard extends ConsumerWidget {
                             fit: BoxFit.cover,
                             errorBuilder: (context, error, stackTrace) =>
                                 Container(
-                              color: Theme.of(context).primaryColor,
-                              child: const Icon(Icons.landscape,
-                                  size: 64, color: Colors.white60),
-                            ),
+                                  color: Theme.of(context).primaryColor,
+                                  child: const Icon(
+                                    Icons.landscape,
+                                    size: 64,
+                                    color: Colors.white60,
+                                  ),
+                                ),
                           ),
                         )
                       : Container(
                           color: Theme.of(context).primaryColor,
-                          child: const Icon(Icons.landscape,
-                              size: 64, color: Colors.white60),
+                          child: const Icon(
+                            Icons.landscape,
+                            size: 64,
+                            color: Colors.white60,
+                          ),
                         ),
                 ),
 
@@ -615,7 +648,9 @@ class _EventCard extends ConsumerWidget {
                     left: 12,
                     child: Container(
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 10, vertical: 4),
+                        horizontal: 10,
+                        vertical: 4,
+                      ),
                       decoration: BoxDecoration(
                         color: Colors.black.withAlpha(191),
                         borderRadius: BorderRadius.circular(12),
@@ -658,8 +693,11 @@ class _EventCard extends ConsumerWidget {
                           value: 'edit',
                           child: Row(
                             children: [
-                              Icon(Icons.edit_outlined,
-                                  size: 20, color: Colors.blue),
+                              Icon(
+                                Icons.edit_outlined,
+                                size: 20,
+                                color: Colors.blue,
+                              ),
                               SizedBox(width: 10),
                               Text('Edit Event'),
                             ],
@@ -669,8 +707,11 @@ class _EventCard extends ConsumerWidget {
                           value: 'delete',
                           child: Row(
                             children: [
-                              Icon(Icons.delete_outline,
-                                  size: 20, color: Colors.redAccent),
+                              Icon(
+                                Icons.delete_outline,
+                                size: 20,
+                                color: Colors.redAccent,
+                              ),
                               SizedBox(width: 10),
                               Text(
                                 'Delete Event',
@@ -706,8 +747,11 @@ class _EventCard extends ConsumerWidget {
                   if (event.locationName != null)
                     Row(
                       children: [
-                        const Icon(Icons.location_on_outlined,
-                            size: 16, color: Colors.redAccent),
+                        const Icon(
+                          Icons.location_on_outlined,
+                          size: 16,
+                          color: Colors.redAccent,
+                        ),
                         const SizedBox(width: 4),
                         Expanded(
                           child: Text(
@@ -727,8 +771,11 @@ class _EventCard extends ConsumerWidget {
                   // Date
                   Row(
                     children: [
-                      Icon(Icons.calendar_today_outlined,
-                          size: 15, color: Theme.of(context).primaryColor),
+                      Icon(
+                        Icons.calendar_today_outlined,
+                        size: 15,
+                        color: Theme.of(context).primaryColor,
+                      ),
                       const SizedBox(width: 6),
                       Text(
                         formattedDate,
@@ -749,8 +796,11 @@ class _EventCard extends ConsumerWidget {
                       // Distance & Elevation
                       Row(
                         children: [
-                          const Icon(Icons.straighten,
-                              size: 16, color: Colors.grey),
+                          const Icon(
+                            Icons.straighten,
+                            size: 16,
+                            color: Colors.grey,
+                          ),
                           const SizedBox(width: 4),
                           Text(
                             event.distanceKm != null

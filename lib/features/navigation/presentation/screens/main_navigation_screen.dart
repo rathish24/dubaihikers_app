@@ -4,10 +4,7 @@ import 'package:go_router/go_router.dart';
 class MainNavigationScreen extends StatelessWidget {
   final StatefulNavigationShell navigationShell;
 
-  const MainNavigationScreen({
-    super.key,
-    required this.navigationShell,
-  });
+  const MainNavigationScreen({super.key, required this.navigationShell});
 
   void _onTapDestination(int index) {
     navigationShell.goBranch(

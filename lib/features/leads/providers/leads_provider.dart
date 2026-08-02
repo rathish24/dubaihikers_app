@@ -1,14 +1,15 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../../core/network/supabase_client_provider.dart';
-import '../../data/datasources/leads_remote_datasource.dart';
-import '../../data/repositories/leads_repository_impl.dart';
-import '../../domain/repositories/leads_repository.dart';
+import '../../../core/network/supabase_client_provider.dart';
+import '../data/datasources/leads_remote_datasource.dart';
+import '../data/repositories/leads_repository_impl.dart';
+import '../domain/repositories/leads_repository.dart';
 
 /// Provider for [LeadsRepository]
 final leadsRepositoryProvider = Provider<LeadsRepository>((ref) {
   final supabaseClient = ref.watch(supabaseClientProvider);
-  final remoteDataSource =
-      LeadsRemoteDataSourceImpl(supabaseClient: supabaseClient);
+  final remoteDataSource = LeadsRemoteDataSourceImpl(
+    supabaseClient: supabaseClient,
+  );
   return LeadsRepositoryImpl(remoteDataSource: remoteDataSource);
 });
 
@@ -51,12 +52,14 @@ class LeadsState {
   /// Returns leads filtered by search query and selected event ID.
   List<LeadModel> get filteredLeads {
     return leads.where((lead) {
-      final matchesEvent = selectedEventId == null ||
+      final matchesEvent =
+          selectedEventId == null ||
           selectedEventId == 'all' ||
           lead.eventId == selectedEventId;
 
       final query = searchQuery.trim().toLowerCase();
-      final matchesSearch = query.isEmpty ||
+      final matchesSearch =
+          query.isEmpty ||
           lead.contactName.toLowerCase().contains(query) ||
           lead.contactEmail.toLowerCase().contains(query) ||
           lead.contactPhone.toLowerCase().contains(query) ||
@@ -100,11 +103,7 @@ class LeadsNotifier extends StateNotifier<LeadsState> {
       final leads = results[0] as List<LeadModel>;
       final events = results[1] as List<EventModel>;
 
-      state = state.copyWith(
-        isLoading: false,
-        leads: leads,
-        events: events,
-      );
+      state = state.copyWith(isLoading: false, leads: leads, events: events);
     } catch (e) {
       state = state.copyWith(
         isLoading: false,
@@ -123,8 +122,9 @@ class LeadsNotifier extends StateNotifier<LeadsState> {
 }
 
 /// Main provider for Leads state management
-final leadsNotifierProvider =
-    StateNotifierProvider<LeadsNotifier, LeadsState>((ref) {
+final leadsNotifierProvider = StateNotifierProvider<LeadsNotifier, LeadsState>((
+  ref,
+) {
   final repository = ref.watch(leadsRepositoryProvider);
   return LeadsNotifier(repository: repository);
 });

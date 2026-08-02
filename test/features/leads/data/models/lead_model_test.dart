@@ -50,7 +50,7 @@ void main() {
           'price': 150.0,
           'currency': 'AED',
           'available_slots': 20,
-        }
+        },
       };
 
       final lead = LeadModel.fromJson(json);

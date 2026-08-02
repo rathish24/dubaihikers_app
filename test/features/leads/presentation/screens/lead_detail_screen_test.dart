@@ -18,31 +18,33 @@ void main() {
     event: EventModel(id: 'event-1', name: 'Shawka Dam Trail'),
   );
 
-  testWidgets('LeadDetailScreen displays name, email, contact, and enquiry notes',
-      (WidgetTester tester) async {
-    await tester.pumpWidget(
-      const MaterialApp(
-        home: LeadDetailScreen(lead: testLead),
-      ),
-    );
+  testWidgets(
+    'LeadDetailScreen displays name, email, contact, and enquiry notes',
+    (WidgetTester tester) async {
+      await tester.pumpWidget(
+        const MaterialApp(home: LeadDetailScreen(lead: testLead)),
+      );
 
-    await tester.pumpAndSettle();
+      await tester.pumpAndSettle();
 
-    // Verify contact name, email, phone
-    expect(find.text('John Doe'), findsNWidgets(2)); // Header & Contact Info
-    expect(find.text('john@example.com'), findsOneWidget);
-    expect(find.text('+971551234567'), findsOneWidget);
+      // Verify contact name, email, phone
+      expect(find.text('John Doe'), findsNWidgets(2)); // Header & Contact Info
+      expect(find.text('john@example.com'), findsOneWidget);
+      expect(find.text('+971551234567'), findsOneWidget);
 
-    // Verify event details
-    expect(find.text('Shawka Dam Trail'), findsOneWidget);
-    expect(find.text('3 hiker(s)'), findsOneWidget);
+      // Verify event details
+      expect(find.text('Shawka Dam Trail'), findsOneWidget);
+      expect(find.text('3 hiker(s)'), findsOneWidget);
 
-    // Verify customer enquiry notes
-    expect(find.text('Is there parking available near the trail head?'),
-        findsOneWidget);
+      // Verify customer enquiry notes
+      expect(
+        find.text('Is there parking available near the trail head?'),
+        findsOneWidget,
+      );
 
-    // Verify call and email buttons
-    expect(find.text('Call'), findsOneWidget);
-    expect(find.text('Email'), findsOneWidget);
-  });
+      // Verify call and email buttons
+      expect(find.text('Call'), findsOneWidget);
+      expect(find.text('Email'), findsOneWidget);
+    },
+  );
 }

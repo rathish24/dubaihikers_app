@@ -1,5 +1,5 @@
-import '../../features/leads/data/models/event_model.dart';
-import '../../features/leads/data/models/lead_model.dart';
+import '../features/leads/data/models/event_model.dart';
+import '../features/leads/data/models/lead_model.dart';
 import 'app_router.dart';
 
 abstract class AppNavigator {
@@ -21,10 +21,7 @@ class AppNavigatorImpl implements AppNavigator {
 
   @override
   void goToLeadDetail(LeadModel lead) {
-    appRouter.router.pushNamed(
-      AppRouter.leadDetailName,
-      extra: lead,
-    );
+    appRouter.router.pushNamed(AppRouter.leadDetailName, extra: lead);
   }
 
   @override
@@ -32,10 +29,7 @@ class AppNavigatorImpl implements AppNavigator {
 
   @override
   void goToEventDetail(EventModel event) {
-    appRouter.router.pushNamed(
-      AppRouter.eventDetailName,
-      extra: event,
-    );
+    appRouter.router.pushNamed(AppRouter.eventDetailName, extra: event);
   }
 
   @override

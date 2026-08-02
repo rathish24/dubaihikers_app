@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import '../../features/events/presentation/screens/event_detail_screen.dart';
-import '../../features/events/presentation/screens/events_screen.dart';
-import '../../features/leads/data/models/event_model.dart';
-import '../../features/leads/data/models/lead_model.dart';
-import '../../features/leads/presentation/screens/lead_detail_screen.dart';
-import '../../features/leads/presentation/screens/leads_screen.dart';
-import '../../features/navigation/presentation/screens/main_navigation_screen.dart';
-import '../../features/profile/presentation/screens/profile_screen.dart';
+import '../features/events/presentation/screens/event_detail_screen.dart';
+import '../features/events/presentation/screens/events_screen.dart';
+import '../features/leads/data/models/event_model.dart';
+import '../features/leads/data/models/lead_model.dart';
+import '../features/leads/presentation/screens/lead_detail_screen.dart';
+import '../features/leads/presentation/screens/leads_screen.dart';
+import '../features/navigation/presentation/screens/main_navigation_screen.dart';
+import '../features/profile/presentation/screens/profile_screen.dart';
 
 class AppRouter {
   static const String leadsPath = '/leads';
@@ -25,8 +25,9 @@ class AppRouter {
   static const String profilePath = '/profile';
   static const String profileName = 'profile';
 
-  final GlobalKey<NavigatorState> rootNavigatorKey =
-      GlobalKey<NavigatorState>(debugLabel: 'rootKey');
+  final GlobalKey<NavigatorState> rootNavigatorKey = GlobalKey<NavigatorState>(
+    debugLabel: 'rootKey',
+  );
 
   late final GoRouter router = GoRouter(
     navigatorKey: rootNavigatorKey,

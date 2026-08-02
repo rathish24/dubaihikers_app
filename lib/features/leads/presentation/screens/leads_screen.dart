@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
-import '../../../../core/navigation/app_navigator_provider.dart';
-import '../providers/leads_provider.dart';
+import '../../../../routes/app_navigator_provider.dart';
+import '../../providers/leads_provider.dart';
 
 class LeadsScreen extends ConsumerWidget {
   const LeadsScreen({super.key});
@@ -62,14 +62,14 @@ class LeadsScreen extends ConsumerWidget {
                           padding: const EdgeInsets.only(right: 8.0),
                           child: FilterChip(
                             label: const Text('All Events'),
-                            selected: state.selectedEventId == null ||
+                            selected:
+                                state.selectedEventId == null ||
                                 state.selectedEventId == 'all',
                             onSelected: (_) => notifier.setSelectedEvent('all'),
                           ),
                         ),
                         ...state.events.map((event) {
-                          final isSelected =
-                              state.selectedEventId == event.id;
+                          final isSelected = state.selectedEventId == event.id;
                           return Padding(
                             padding: const EdgeInsets.only(right: 8.0),
                             child: FilterChip(
@@ -89,9 +89,7 @@ class LeadsScreen extends ConsumerWidget {
           const Divider(height: 1),
 
           // Main Body Content
-          Expanded(
-            child: _buildBody(context, ref, state, notifier),
-          ),
+          Expanded(child: _buildBody(context, ref, state, notifier)),
         ],
       ),
     );
@@ -104,9 +102,7 @@ class LeadsScreen extends ConsumerWidget {
     LeadsNotifier notifier,
   ) {
     if (state.isLoading) {
-      return const Center(
-        child: CircularProgressIndicator(),
-      );
+      return const Center(child: CircularProgressIndicator());
     }
 
     if (state.errorMessage != null) {
@@ -124,9 +120,9 @@ class LeadsScreen extends ConsumerWidget {
               const SizedBox(height: 16),
               Text(
                 'Oops! Something went wrong',
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
+                style: Theme.of(
+                  context,
+                ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 8),
               Text(
@@ -168,8 +164,8 @@ class LeadsScreen extends ConsumerWidget {
                 Text(
                   'No registered leads found',
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        color: Colors.grey.shade600,
-                      ),
+                    color: Colors.grey.shade600,
+                  ),
                 ),
               ],
             ),
@@ -187,10 +183,7 @@ class LeadsScreen extends ConsumerWidget {
           final eventName = groupedLeads.keys.elementAt(index);
           final leadsList = groupedLeads[eventName]!;
 
-          return _EventLeadGroupCard(
-            eventName: eventName,
-            leads: leadsList,
-          );
+          return _EventLeadGroupCard(eventName: eventName, leads: leadsList);
         },
       ),
     );
@@ -201,10 +194,7 @@ class _EventLeadGroupCard extends ConsumerWidget {
   final String eventName;
   final List<dynamic> leads;
 
-  const _EventLeadGroupCard({
-    required this.eventName,
-    required this.leads,
-  });
+  const _EventLeadGroupCard({required this.eventName, required this.leads});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -255,7 +245,9 @@ class _EventLeadGroupCard extends ConsumerWidget {
                     ),
                     Container(
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 10, vertical: 4),
+                        horizontal: 10,
+                        vertical: 4,
+                      ),
                       decoration: BoxDecoration(
                         color: Theme.of(context).primaryColor,
                         borderRadius: BorderRadius.circular(12),
@@ -304,15 +296,17 @@ class _EventLeadGroupCard extends ConsumerWidget {
             separatorBuilder: (context, index) => const Divider(height: 1),
             itemBuilder: (context, index) {
               final lead = leads[index];
-              final hasEnquiry = lead.customerNotes != null &&
+              final hasEnquiry =
+                  lead.customerNotes != null &&
                   lead.customerNotes!.trim().isNotEmpty;
 
               return ListTile(
-                contentPadding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 6,
+                ),
                 leading: CircleAvatar(
-                  backgroundColor:
-                      Theme.of(context).primaryColor.withAlpha(30),
+                  backgroundColor: Theme.of(context).primaryColor.withAlpha(30),
                   child: Text(
                     lead.contactName.isNotEmpty
                         ? lead.contactName[0].toUpperCase()
@@ -373,8 +367,11 @@ class _EventLeadGroupCard extends ConsumerWidget {
                     const SizedBox(height: 2),
                     Row(
                       children: [
-                        const Icon(Icons.email_outlined,
-                            size: 14, color: Colors.grey),
+                        const Icon(
+                          Icons.email_outlined,
+                          size: 14,
+                          color: Colors.grey,
+                        ),
                         const SizedBox(width: 4),
                         Expanded(
                           child: Text(
@@ -390,8 +387,11 @@ class _EventLeadGroupCard extends ConsumerWidget {
                     const SizedBox(height: 2),
                     Row(
                       children: [
-                        const Icon(Icons.phone_outlined,
-                            size: 14, color: Colors.grey),
+                        const Icon(
+                          Icons.phone_outlined,
+                          size: 14,
+                          color: Colors.grey,
+                        ),
                         const SizedBox(width: 4),
                         Text(
                           lead.contactPhone,

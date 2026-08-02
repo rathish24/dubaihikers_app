@@ -2,7 +2,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:dubaihikers_app/features/leads/domain/repositories/leads_repository.dart';
-import 'package:dubaihikers_app/features/leads/presentation/providers/leads_provider.dart';
+import 'package:dubaihikers_app/features/leads/providers/leads_provider.dart';
 
 class MockLeadsRepository extends Mock implements LeadsRepository {}
 
@@ -36,17 +36,15 @@ void main() {
 
   setUp(() {
     mockRepository = MockLeadsRepository();
-    when(() => mockRepository.getLeads())
-        .thenAnswer((_) async => sampleLeads);
-    when(() => mockRepository.getEvents())
-        .thenAnswer((_) async => sampleEvents);
+    when(() => mockRepository.getLeads()).thenAnswer((_) async => sampleLeads);
+    when(
+      () => mockRepository.getEvents(),
+    ).thenAnswer((_) async => sampleEvents);
   });
 
   test('LeadsNotifier loads leads and events successfully', () async {
     final container = ProviderContainer(
-      overrides: [
-        leadsRepositoryProvider.overrideWithValue(mockRepository),
-      ],
+      overrides: [leadsRepositoryProvider.overrideWithValue(mockRepository)],
     );
     addTearDown(container.dispose);
 
@@ -63,9 +61,7 @@ void main() {
 
   test('LeadsNotifier search query filters leads correctly', () async {
     final container = ProviderContainer(
-      overrides: [
-        leadsRepositoryProvider.overrideWithValue(mockRepository),
-      ],
+      overrides: [leadsRepositoryProvider.overrideWithValue(mockRepository)],
     );
     addTearDown(container.dispose);
 
@@ -81,9 +77,7 @@ void main() {
 
   test('LeadsNotifier filtering by event works correctly', () async {
     final container = ProviderContainer(
-      overrides: [
-        leadsRepositoryProvider.overrideWithValue(mockRepository),
-      ],
+      overrides: [leadsRepositoryProvider.overrideWithValue(mockRepository)],
     );
     addTearDown(container.dispose);
 

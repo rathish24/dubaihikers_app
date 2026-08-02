@@ -17,7 +17,9 @@ class LeadsRemoteDataSourceImpl implements LeadsRemoteDataSource {
   Future<List<LeadModel>> fetchLeads() async {
     final response = await supabaseClient
         .from(SupabaseConstants.eventRegistrationsTable)
-        .select('*, events(id, name, starts_at, location_name, status, price, currency, available_slots)')
+        .select(
+          '*, events(id, name, starts_at, location_name, status, price, currency, available_slots)',
+        )
         .order('created_at', ascending: false);
 
     final dataList = response as List<dynamic>;

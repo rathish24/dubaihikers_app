@@ -56,15 +56,21 @@ class EventDetailScreen extends StatelessWidget {
                       fit: BoxFit.cover,
                       errorBuilder: (context, error, stackTrace) => Container(
                         color: Theme.of(context).primaryColor,
-                        child: const Icon(Icons.landscape,
-                            size: 80, color: Colors.white70),
+                        child: const Icon(
+                          Icons.landscape,
+                          size: 80,
+                          color: Colors.white70,
+                        ),
                       ),
                     )
                   else
                     Container(
                       color: Theme.of(context).primaryColor,
-                      child: const Icon(Icons.landscape,
-                          size: 80, color: Colors.white70),
+                      child: const Icon(
+                        Icons.landscape,
+                        size: 80,
+                        color: Colors.white70,
+                      ),
                     ),
                   // Dark Gradient Overlay for readability
                   Container(
@@ -97,7 +103,9 @@ class EventDetailScreen extends StatelessWidget {
                       if (event.difficulty != null)
                         Container(
                           padding: const EdgeInsets.symmetric(
-                              horizontal: 12, vertical: 6),
+                            horizontal: 12,
+                            vertical: 6,
+                          ),
                           decoration: BoxDecoration(
                             color: diffColor.withAlpha(38),
                             borderRadius: BorderRadius.circular(20),
@@ -123,7 +131,9 @@ class EventDetailScreen extends StatelessWidget {
                       if (event.status != null)
                         Container(
                           padding: const EdgeInsets.symmetric(
-                              horizontal: 12, vertical: 6),
+                            horizontal: 12,
+                            vertical: 6,
+                          ),
                           decoration: BoxDecoration(
                             color: Colors.green.shade50,
                             borderRadius: BorderRadius.circular(20),
@@ -156,8 +166,11 @@ class EventDetailScreen extends StatelessWidget {
                   if (event.locationName != null)
                     Row(
                       children: [
-                        const Icon(Icons.location_on,
-                            color: Colors.redAccent, size: 20),
+                        const Icon(
+                          Icons.location_on,
+                          color: Colors.redAccent,
+                          size: 20,
+                        ),
                         const SizedBox(width: 6),
                         Expanded(
                           child: Text(
@@ -176,8 +189,11 @@ class EventDetailScreen extends StatelessWidget {
                   // Date
                   Row(
                     children: [
-                      Icon(Icons.calendar_month,
-                          color: Theme.of(context).primaryColor, size: 20),
+                      Icon(
+                        Icons.calendar_month,
+                        color: Theme.of(context).primaryColor,
+                        size: 20,
+                      ),
                       const SizedBox(width: 6),
                       Text(
                         formattedDate,
@@ -242,10 +258,9 @@ class EventDetailScreen extends StatelessWidget {
                       event.description!.isNotEmpty) ...[
                     Text(
                       'About This Hike',
-                      style:
-                          Theme.of(context).textTheme.titleMedium?.copyWith(
-                                fontWeight: FontWeight.bold,
-                              ),
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                     const SizedBox(height: 8),
                     Text(
@@ -264,10 +279,9 @@ class EventDetailScreen extends StatelessWidget {
                       event.highlights!.isNotEmpty) ...[
                     Text(
                       'Trail Highlights',
-                      style:
-                          Theme.of(context).textTheme.titleMedium?.copyWith(
-                                fontWeight: FontWeight.bold,
-                              ),
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                     const SizedBox(height: 8),
                     Card(
@@ -276,13 +290,16 @@ class EventDetailScreen extends StatelessWidget {
                         child: Column(
                           children: event.highlights!.map((highlight) {
                             return Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(vertical: 4.0),
+                              padding: const EdgeInsets.symmetric(
+                                vertical: 4.0,
+                              ),
                               child: Row(
                                 children: [
-                                  Icon(Icons.check_circle,
-                                      size: 18,
-                                      color: Theme.of(context).primaryColor),
+                                  Icon(
+                                    Icons.check_circle,
+                                    size: 18,
+                                    color: Theme.of(context).primaryColor,
+                                  ),
                                   const SizedBox(width: 10),
                                   Expanded(
                                     child: Text(
@@ -305,10 +322,9 @@ class EventDetailScreen extends StatelessWidget {
                       event.includedItems!.isNotEmpty) ...[
                     Text(
                       'What\'s Included',
-                      style:
-                          Theme.of(context).textTheme.titleMedium?.copyWith(
-                                fontWeight: FontWeight.bold,
-                              ),
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                     const SizedBox(height: 8),
                     Card(
@@ -317,12 +333,16 @@ class EventDetailScreen extends StatelessWidget {
                         child: Column(
                           children: event.includedItems!.map((item) {
                             return Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(vertical: 4.0),
+                              padding: const EdgeInsets.symmetric(
+                                vertical: 4.0,
+                              ),
                               child: Row(
                                 children: [
-                                  const Icon(Icons.verified,
-                                      size: 18, color: Colors.orange),
+                                  const Icon(
+                                    Icons.verified,
+                                    size: 18,
+                                    color: Colors.orange,
+                                  ),
                                   const SizedBox(width: 10),
                                   Expanded(
                                     child: Text(
@@ -345,10 +365,9 @@ class EventDetailScreen extends StatelessWidget {
                       event.meetingPointLabel!.isNotEmpty) ...[
                     Text(
                       'Meeting Point',
-                      style:
-                          Theme.of(context).textTheme.titleMedium?.copyWith(
-                                fontWeight: FontWeight.bold,
-                              ),
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                     const SizedBox(height: 8),
                     Card(
@@ -402,17 +421,11 @@ class _StatItem extends StatelessWidget {
         const SizedBox(height: 4),
         Text(
           value,
-          style: const TextStyle(
-            fontSize: 13,
-            fontWeight: FontWeight.bold,
-          ),
+          style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
         ),
         Text(
           label,
-          style: TextStyle(
-            fontSize: 11,
-            color: Colors.grey.shade600,
-          ),
+          style: TextStyle(fontSize: 11, color: Colors.grey.shade600),
         ),
       ],
     );

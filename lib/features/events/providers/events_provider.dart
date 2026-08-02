@@ -1,15 +1,16 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../../core/network/supabase_client_provider.dart';
-import '../../../leads/data/models/event_model.dart';
-import '../../data/datasources/events_remote_datasource.dart';
-import '../../data/repositories/events_repository_impl.dart';
-import '../../domain/repositories/events_repository.dart';
+import '../../../core/network/supabase_client_provider.dart';
+import '../../leads/data/models/event_model.dart';
+import '../data/datasources/events_remote_datasource.dart';
+import '../data/repositories/events_repository_impl.dart';
+import '../domain/repositories/events_repository.dart';
 
 /// Provider for [EventsRepository]
 final eventsRepositoryProvider = Provider<EventsRepository>((ref) {
   final supabaseClient = ref.watch(supabaseClientProvider);
-  final remoteDataSource =
-      EventsRemoteDataSourceImpl(supabaseClient: supabaseClient);
+  final remoteDataSource = EventsRemoteDataSourceImpl(
+    supabaseClient: supabaseClient,
+  );
   return EventsRepositoryImpl(remoteDataSource: remoteDataSource);
 });
 
@@ -63,7 +64,8 @@ class EventsState {
       }
 
       final query = searchQuery.trim().toLowerCase();
-      final matchesSearch = query.isEmpty ||
+      final matchesSearch =
+          query.isEmpty ||
           event.name.toLowerCase().contains(query) ||
           (event.locationName?.toLowerCase().contains(query) ?? false) ||
           (event.description?.toLowerCase().contains(query) ?? false);
@@ -85,10 +87,7 @@ class EventsNotifier extends StateNotifier<EventsState> {
     state = state.copyWith(isLoading: true, errorMessage: null);
     try {
       final list = await repository.getEvents();
-      state = state.copyWith(
-        isLoading: false,
-        events: list,
-      );
+      state = state.copyWith(isLoading: false, events: list);
     } catch (e) {
       state = state.copyWith(
         isLoading: false,
@@ -141,6 +140,6 @@ class EventsNotifier extends StateNotifier<EventsState> {
 /// Main provider for Events state management
 final eventsNotifierProvider =
     StateNotifierProvider<EventsNotifier, EventsState>((ref) {
-  final repository = ref.watch(eventsRepositoryProvider);
-  return EventsNotifier(repository: repository);
-});
+      final repository = ref.watch(eventsRepositoryProvider);
+      return EventsNotifier(repository: repository);
+    });

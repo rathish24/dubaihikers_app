@@ -25,13 +25,12 @@ class LeadDetailScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final dateFormat = DateFormat('MMM dd, yyyy - hh:mm a');
-    final formattedDate =
-        lead.createdAt != null ? dateFormat.format(lead.createdAt!) : 'N/A';
+    final formattedDate = lead.createdAt != null
+        ? dateFormat.format(lead.createdAt!)
+        : 'N/A';
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Lead Details'),
-      ),
+      appBar: AppBar(title: const Text('Lead Details')),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -45,8 +44,9 @@ class LeadDetailScreen extends StatelessWidget {
                   children: [
                     CircleAvatar(
                       radius: 32,
-                      backgroundColor:
-                          Theme.of(context).primaryColor.withAlpha(25),
+                      backgroundColor: Theme.of(
+                        context,
+                      ).primaryColor.withAlpha(25),
                       child: Text(
                         lead.contactName.isNotEmpty
                             ? lead.contactName[0].toUpperCase()
@@ -65,18 +65,16 @@ class LeadDetailScreen extends StatelessWidget {
                         children: [
                           Text(
                             lead.contactName,
-                            style: Theme.of(context)
-                                .textTheme
-                                .titleLarge
-                                ?.copyWith(
-                                  fontWeight: FontWeight.bold,
-                                ),
+                            style: Theme.of(context).textTheme.titleLarge
+                                ?.copyWith(fontWeight: FontWeight.bold),
                           ),
                           const SizedBox(height: 4),
                           if (lead.referenceNumber != null)
                             Container(
                               padding: const EdgeInsets.symmetric(
-                                  horizontal: 8, vertical: 2),
+                                horizontal: 8,
+                                vertical: 2,
+                              ),
                               decoration: BoxDecoration(
                                 color: Colors.grey.shade200,
                                 borderRadius: BorderRadius.circular(6),
@@ -150,9 +148,9 @@ class LeadDetailScreen extends StatelessWidget {
             // Section: Contact Details
             Text(
               'Contact Information',
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
+              style: Theme.of(
+                context,
+              ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
             Card(
@@ -186,9 +184,9 @@ class LeadDetailScreen extends StatelessWidget {
             // Section: Event & Booking Info
             Text(
               'Event Details',
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
+              style: Theme.of(
+                context,
+              ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
             Card(
@@ -224,7 +222,8 @@ class LeadDetailScreen extends StatelessWidget {
                         icon: Icons.verified_user,
                         label: 'Payment Status',
                         value: lead.paymentStatus!.toUpperCase(),
-                        valueColor: lead.paymentStatus == 'paid' ||
+                        valueColor:
+                            lead.paymentStatus == 'paid' ||
                                 lead.paymentStatus == 'succeeded'
                             ? Colors.green.shade700
                             : Colors.orange.shade700,
@@ -241,9 +240,9 @@ class LeadDetailScreen extends StatelessWidget {
                 lead.customerNotes!.trim().isNotEmpty) ...[
               Text(
                 'Enquiry & Customer Notes',
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
+                style: Theme.of(
+                  context,
+                ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 8),
               Card(
@@ -337,10 +336,7 @@ class _DetailRow extends StatelessWidget {
           const SizedBox(width: 12),
           Text(
             label,
-            style: TextStyle(
-              fontSize: 14,
-              color: Colors.grey.shade600,
-            ),
+            style: TextStyle(fontSize: 14, color: Colors.grey.shade600),
           ),
           const Spacer(),
           Flexible(

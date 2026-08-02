@@ -2,7 +2,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:dubaihikers_app/features/events/domain/repositories/events_repository.dart';
-import 'package:dubaihikers_app/features/events/presentation/providers/events_provider.dart';
+import 'package:dubaihikers_app/features/events/providers/events_provider.dart';
 import 'package:dubaihikers_app/features/leads/data/models/event_model.dart';
 
 class MockEventsRepository extends Mock implements EventsRepository {}
@@ -29,12 +29,11 @@ void main() {
 
   setUp(() {
     mockRepository = MockEventsRepository();
-    when(() => mockRepository.getEvents())
-        .thenAnswer((_) async => sampleEvents);
-    when(() => mockRepository.updateEvent(any()))
-        .thenAnswer((_) async => {});
-    when(() => mockRepository.deleteEvent(any()))
-        .thenAnswer((_) async => {});
+    when(
+      () => mockRepository.getEvents(),
+    ).thenAnswer((_) async => sampleEvents);
+    when(() => mockRepository.updateEvent(any())).thenAnswer((_) async => {});
+    when(() => mockRepository.deleteEvent(any())).thenAnswer((_) async => {});
   });
 
   setUpAll(() {
@@ -45,9 +44,7 @@ void main() {
 
   test('EventsNotifier loads events successfully', () async {
     final container = ProviderContainer(
-      overrides: [
-        eventsRepositoryProvider.overrideWithValue(mockRepository),
-      ],
+      overrides: [eventsRepositoryProvider.overrideWithValue(mockRepository)],
     );
     addTearDown(container.dispose);
 
@@ -62,9 +59,7 @@ void main() {
 
   test('EventsNotifier updateEvent updates existing event in state', () async {
     final container = ProviderContainer(
-      overrides: [
-        eventsRepositoryProvider.overrideWithValue(mockRepository),
-      ],
+      overrides: [eventsRepositoryProvider.overrideWithValue(mockRepository)],
     );
     addTearDown(container.dispose);
 
@@ -89,9 +84,7 @@ void main() {
 
   test('EventsNotifier deleteEvent removes event from state', () async {
     final container = ProviderContainer(
-      overrides: [
-        eventsRepositoryProvider.overrideWithValue(mockRepository),
-      ],
+      overrides: [eventsRepositoryProvider.overrideWithValue(mockRepository)],
     );
     addTearDown(container.dispose);
 
